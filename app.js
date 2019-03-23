@@ -15,8 +15,10 @@ pa.forEach(function(fn) {
   }
   res[getName(fn)] = result
 })
+
 var f0 = process.argv[2]
 var nRes = dupExceptComponents(res[f0])
+
 buildComponents(nRes,res,nRes)
 
 console.log(YAML.stringify(nRes,24,2))
@@ -77,6 +79,7 @@ function dupExceptComponents(jobj) {
     }
   }
   r["components"] = {}
+  r["components"]["schemas"] = {}
   return r
 }
 function buildComponents(jobj,allyaml,myself) {
@@ -86,21 +89,24 @@ function buildComponents(jobj,allyaml,myself) {
       var ref = v['$ref']
       var rs = ref.substring(2,ref.length)
       var s = rs.split('/')
-      var robj = allyaml[s[0]][s[1]]
-      var mobj = myself["components"]
-      var ss = 2
-      for(;ss<s.length-1;ss++) {
-        var kk = s[ss]
-        if(mobj[kk] == null) {
-          mobj[kk] = {}
+      if(s[0] != "components") {
+        var robj = allyaml[s[0]][s[1]]
+        var mobj = myself["components"]
+        var ss = 2
+        for(;ss<s.length-1;ss++) {
+          var kk = s[ss]
+          if(mobj[kk] == null) {
+            mobj[kk] = {}
+          }
+          mobj = mobj[kk]
+          robj = robj[kk]
         }
-        mobj = mobj[kk]
-        robj = robj[kk]
+        mobj[s[ss]] = robj[s[ss]]
+        s[0] = "#"
+        jobj[key] = {"$ref":s.join("/")}
+        buildComponents(mobj[s[ss]],allyaml,myself)  
       }
-      mobj[s[ss]] = robj[s[ss]]
-      s[0] = ""
-      jobj[key] = "#"+s.join("/")
-      buildComponents(mobj[s[ss]],allyaml,myself)
+      
     } else if(v.length > 0 && typeof(v) == "object" || typeof(v) == "object") {
       buildComponents(v,allyaml,myself)
     }
