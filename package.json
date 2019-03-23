@@ -1,0 +1,20 @@
+{
+  "name": "apigen",
+  "version": "1.0.0",
+  "description": "open api generator",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "a4a881d4",
+  "license": "MIT",
+  "engines": {
+      "node": "8.10.x"
+  },
+  "devDependencies": {
+      "yamljs": "latest"
+  },
+  "dependencies": {
+      "yamljs": "latest"
+  }
+}
